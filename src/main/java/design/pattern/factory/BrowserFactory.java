@@ -1,48 +1,48 @@
 package design.pattern.factory;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 
-public class BrowserFactory {
+import java.util.logging.Logger;
+
+public class BrowserFactory implements BrowserFactoryInterface{
 
     public WebDriver driver;
-    private final DriverObjectPool driverPool;
+    private static Logger logger = Logger.getLogger(BrowserFactory.class.getName());
+    public BrowserFactory(){
 
-    public BrowserFactory(DriverObjectPool driverPool){
-        this.driverPool = driverPool;
     }
-    public WebDriver getInstance(BrowserType type) {
+    public WebDriver getInstance(BrowserType type, String url, Capabilities capabilities) {
 
         if(type != null) {
 
             switch(type) {
 
-                case chrome:
-                    return driverPool.getDriver(BrowserType.chrome, new ChromeBrowser());
-                case firefox:
-                    return driverPool.getDriver(BrowserType.firefox, new FirefoxBrowser());
+                case CHROME:
+                    driver =  new ChromeBrowser().launchBrowser(capabilities);
+                    logger.info("Got the chrome driver -> " + driver.hashCode());
+                    break;
+                case FIREFOX:
+                    driver = new FirefoxBrowser().launchBrowser(capabilities);
+                    logger.info("Got the firefox driver -> " + driver.hashCode());
+                    break;
                 default:
                     throw new IllegalArgumentException("Please select a valid browser");
             }
-
         }
-
-        throw new IllegalArgumentException("Invalid Argument");
-
+        launchURL(url);
+        return driver;
     }
 
-    public WebDriver launchURL(WebDriver driver, String url) {
-
+    public void launchURL(String url) {
+        logger.info("Setting up the Browser and Launching the URL");
         BrowserHelper helper = new BrowserHelper(driver);
         helper.maximiseBrowser();
         helper.useImpicitWait();
         helper.loadURL(url);
-
-        return driver;
-
-    }
-
-    public void releaseInstance(BrowserType browserType, WebDriver driver ){
-        driverPool.releaseDriver(browserType,driver);
+        logger.info("URL is launched. Title is -> " + driver.getTitle());
     }
 
 }
