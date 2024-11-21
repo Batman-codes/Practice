@@ -11,6 +11,7 @@ public class BrowserFactory implements BrowserFactoryInterface{
 
     public WebDriver driver;
     private static Logger logger = Logger.getLogger(BrowserFactory.class.getName());
+
     public BrowserFactory(){
 
     }
